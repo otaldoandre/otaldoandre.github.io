@@ -1,0 +1,26 @@
+baseURL = "https://otaldoandre.github.io/"
+languageCode = "pt-br"
+title = "André"
+
+theme = "PaperMod"
+
+[params]
+  defaultTheme = "light"
+  ShowReadingTime = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = false
+  ShowCodeCopyButtons = false
+  ShowShareButtons = false
+  disableSpecial1stPost = true
+  [params.homeInfoParams]
+    Title = ""
+    Content = ""
+[menus]
+
+  [[menus.main]]
+    name = "Sobre"
+    pageRef = "/about"
+    weight = 2
+
+
+
