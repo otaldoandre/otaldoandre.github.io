@@ -1,0 +1,233 @@
+{{- /* Kudos minimalista - versão final */ -}}
+{{- if .IsPage -}}
+<div class="kudos-wrapper">
+    <button class="kudos-button" id="kudos-btn" aria-label="Curtir">
+        <svg class="kudos-circle" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Círculo de fundo -->
+            <circle class="kudos-bg" cx="50" cy="50" r="45" />
+            <!-- Círculo de preenchimento -->
+            <circle class="kudos-fill" cx="50" cy="50" r="45" />
+        </svg>
+    </button>
+    <div class="kudos-info">
+        <span class="kudos-count">0</span>
+        <span class="kudos-label">curtidas</span>
+    </div>
+</div>
+
+<style>
+.kudos-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2.5rem auto;
+    max-width: 200px;
+}
+
+.kudos-button {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 60px;
+    height: 60px;
+    display: block;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.kudos-button:hover {
+    transform: scale(1.08);
+}
+
+.kudos-button:active {
+    transform: scale(0.98);
+}
+
+.kudos-button.completed {
+    cursor: default;
+}
+
+.kudos-circle {
+    width: 100%;
+    height: 100%;
+}
+
+.kudos-bg {
+    fill: none;
+    stroke: var(--border, #e0e0e0);
+    stroke-width: 3;
+}
+
+.kudos-fill {
+    fill: var(--primary, #1a73e8);
+    opacity: 0;
+    transform: scale(0);
+    transform-origin: center;
+    transition: all 0.05s linear;
+}
+
+.kudos-button.filling .kudos-fill {
+    opacity: 1;
+}
+
+.kudos-button.completed .kudos-fill {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.kudos-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+}
+
+.kudos-count {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--content, #333);
+    line-height: 1;
+}
+
+.kudos-label {
+    font-size: 0.8rem;
+    color: var(--secondary, #999);
+    text-transform: lowercase;
+}
+
+.kudos-button.completed ~ .kudos-info .kudos-count,
+.kudos-button.completed ~ .kudos-info .kudos-label {
+    color: var(--primary, #1a73e8);
+}
+</style>
+
+<script>
+(function() {
+    const btn = document.getElementById('kudos-btn');
+    if (!btn) return;
+
+    const countEl = btn.parentElement.querySelector('.kudos-count');
+    const labelEl = btn.parentElement.querySelector('.kudos-label');
+    const fillCircle = btn.querySelector('.kudos-fill');
+
+    const HOVER_DURATION = 1200; // 1.2 segundos
+    const SITE_ID = '7ehetax5Jpj27Y8Wrhz_';
+    const currentPath = window.location.pathname;
+
+    let hoverTimer = null;
+    let startTime = 0;
+    let animationFrame = null;
+    let hasGivenKudos = false;
+    let currentCount = 0;
+
+    // Verifica se já curtiu
+    const storageKey = `kudos_given_${currentPath}`;
+    hasGivenKudos = localStorage.getItem(storageKey) === 'true';
+
+    // Busca a contagem
+    async function fetchKudosCount() {
+        try {
+            const response = await fetch(`https://tinylytics.app/api/${SITE_ID}/kudos?path=${encodeURIComponent(currentPath)}`);
+            const data = await response.json();
+            currentCount = data.count || 0;
+            updateCountDisplay();
+
+            if (hasGivenKudos) {
+                btn.classList.add('completed');
+            }
+        } catch (error) {
+            console.error('Erro ao buscar kudos:', error);
+        }
+    }
+
+    // Atualiza o texto da contagem
+    function updateCountDisplay() {
+        countEl.textContent = currentCount;
+        labelEl.textContent = currentCount === 1 ? 'curtida' : 'curtidas';
+    }
+
+    // Envia o kudos
+    async function sendKudos() {
+        try {
+            const response = await fetch(`https://tinylytics.app/api/${SITE_ID}/kudos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: currentPath })
+            });
+
+            if (response.ok) {
+                currentCount++;
+                updateCountDisplay();
+                localStorage.setItem(storageKey, 'true');
+                hasGivenKudos = true;
+                btn.classList.add('completed');
+            }
+        } catch (error) {
+            console.error('Erro ao enviar kudos:', error);
+        }
+    }
+
+    // Animação de preenchimento (crescimento do círculo)
+    function updateFillProgress() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / HOVER_DURATION, 1);
+
+        // Escala o círculo de 0 a 1
+        fillCircle.style.transform = `scale(${progress})`;
+
+        if (progress < 1) {
+            animationFrame = requestAnimationFrame(updateFillProgress);
+        } else {
+            // Completou!
+            sendKudos();
+            btn.classList.remove('filling');
+        }
+    }
+
+    // Eventos do mouse
+    btn.addEventListener('mouseenter', () => {
+        if (hasGivenKudos) return;
+
+        startTime = Date.now();
+        btn.classList.add('filling');
+        updateFillProgress();
+    });
+
+    btn.addEventListener('mouseleave', () => {
+        if (hasGivenKudos) return;
+
+        if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+        }
+        btn.classList.remove('filling');
+        fillCircle.style.transform = 'scale(0)';
+    });
+
+    // Touch events para mobile
+    btn.addEventListener('touchstart', (e) => {
+        if (hasGivenKudos) return;
+        e.preventDefault();
+
+        startTime = Date.now();
+        btn.classList.add('filling');
+        updateFillProgress();
+    });
+
+    btn.addEventListener('touchend', () => {
+        if (hasGivenKudos) return;
+
+        if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+        }
+        btn.classList.remove('filling');
+        fillCircle.style.transform = 'scale(0)';
+    });
+
+    // Inicializa
+    fetchKudosCount();
+})();
+</script>
+{{- end -}}
