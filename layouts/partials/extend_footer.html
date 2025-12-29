@@ -1,4 +1,4 @@
-{{- /* Kudos minimalista - versão final */ -}}
+{{- /* Kudos customizado usando eventos do Tinylytics */ -}}
 {{- if .IsPage -}}
 <div class="kudos-wrapper">
     <button class="kudos-button" id="kudos-btn" aria-label="Curtir">
@@ -14,6 +14,9 @@
         <span class="kudos-label">curtidas</span>
     </div>
 </div>
+
+<!-- Botão invisível do Tinylytics (necessário para funcionar) -->
+<button class="tinylytics_kudos" style="display: none;"></button>
 
 <style>
 .kudos-wrapper {
@@ -48,6 +51,10 @@
 
 .kudos-button.completed {
     cursor: default;
+}
+
+.kudos-button.completed:hover {
+    transform: scale(1);
 }
 
 .kudos-circle {
@@ -107,17 +114,17 @@
 <script>
 (function() {
     const btn = document.getElementById('kudos-btn');
-    if (!btn) return;
+    const tinylyticsBtn = document.querySelector('.tinylytics_kudos');
+
+    if (!btn || !tinylyticsBtn) return;
 
     const countEl = btn.parentElement.querySelector('.kudos-count');
     const labelEl = btn.parentElement.querySelector('.kudos-label');
     const fillCircle = btn.querySelector('.kudos-fill');
 
     const HOVER_DURATION = 1200; // 1.2 segundos
-    const SITE_ID = '7ehetax5Jpj27Y8Wrhz_';
     const currentPath = window.location.pathname;
 
-    let hoverTimer = null;
     let startTime = 0;
     let animationFrame = null;
     let hasGivenKudos = false;
@@ -127,55 +134,51 @@
     const storageKey = `kudos_given_${currentPath}`;
     hasGivenKudos = localStorage.getItem(storageKey) === 'true';
 
-    // Busca a contagem
-    async function fetchKudosCount() {
-        try {
-            const response = await fetch(`https://tinylytics.app/api/${SITE_ID}/kudos?path=${encodeURIComponent(currentPath)}`);
-            const data = await response.json();
-            currentCount = data.count || 0;
-            updateCountDisplay();
+    // Aguarda o Tinylytics carregar e pega o contador inicial
+    function waitForTinylytics() {
+        const checkInterval = setInterval(() => {
+            // O Tinylytics injeta o número no botão dele
+            const count = tinylyticsBtn.textContent.trim();
+            if (count !== '') {
+                clearInterval(checkInterval);
+                currentCount = parseInt(count) || 0;
+                updateCountDisplay();
 
-            if (hasGivenKudos) {
-                btn.classList.add('completed');
+                if (hasGivenKudos || tinylyticsBtn.classList.contains('did_select')) {
+                    btn.classList.add('completed');
+                    hasGivenKudos = true;
+                }
             }
-        } catch (error) {
-            console.error('Erro ao buscar kudos:', error);
-        }
+        }, 100);
+
+        // Timeout de 5 segundos
+        setTimeout(() => clearInterval(checkInterval), 5000);
     }
 
-    // Atualiza o texto da contagem
+    // Atualiza o display
     function updateCountDisplay() {
         countEl.textContent = currentCount;
         labelEl.textContent = currentCount === 1 ? 'curtida' : 'curtidas';
     }
 
-    // Envia o kudos
-    async function sendKudos() {
-        try {
-            const response = await fetch(`https://tinylytics.app/api/${SITE_ID}/kudos`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ path: currentPath })
-            });
+    // Trigger do kudos via Tinylytics
+    function sendKudos() {
+        // Clica no botão invisível do Tinylytics
+        tinylyticsBtn.click();
 
-            if (response.ok) {
-                currentCount++;
-                updateCountDisplay();
-                localStorage.setItem(storageKey, 'true');
-                hasGivenKudos = true;
-                btn.classList.add('completed');
-            }
-        } catch (error) {
-            console.error('Erro ao enviar kudos:', error);
-        }
+        // Atualiza nosso estado
+        currentCount++;
+        updateCountDisplay();
+        localStorage.setItem(storageKey, 'true');
+        hasGivenKudos = true;
+        btn.classList.add('completed');
     }
 
-    // Animação de preenchimento (crescimento do círculo)
+    // Animação de preenchimento
     function updateFillProgress() {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / HOVER_DURATION, 1);
 
-        // Escala o círculo de 0 a 1
         fillCircle.style.transform = `scale(${progress})`;
 
         if (progress < 1) {
@@ -227,7 +230,7 @@
     });
 
     // Inicializa
-    fetchKudosCount();
+    waitForTinylytics();
 })();
 </script>
 {{- end -}}
