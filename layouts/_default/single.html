@@ -41,17 +41,19 @@
     {{- else }}{{ .Content }}{{ end }}
   </div>
   {{- end }}
-
-  {{- /* KUDOS - Adicionado aqui, ANTES do footer */ -}}
-  {{- partial "extend_footer.html" . -}}
-
-  <footer class="post-footer">
-    {{- $tags := .Language.Params.Taxonomies.tag | default "tags" }}
+  <br>
+  {{- /* TAGS - Posicionando as tags, ANTES do KUDOS */ -}}
+  {{- $tags := .Language.Params.Taxonomies.tag | default "tags" }}
     <ul class="post-tags">
       {{- range ($.GetTerms $tags) }}
       <li><a href="{{ .Permalink }}">{{ .LinkTitle }}</a></li>
       {{- end }}
     </ul>
+  {{- /* KUDOS - Adicionado aqui, ANTES do footer */ -}}
+  {{- partial "extend_footer.html" . -}}
+
+  <footer class="post-footer">
+
     {{- if (.Param "ShowPostNavLinks") }}
     {{- partial "post_nav_links.html" . }}
     {{- end }}

@@ -13,14 +13,19 @@ theme = "PaperMod"
   ShowShareButtons = false
   disableSpecial1stPost = true
   [params.homeInfoParams]
-    Title = ""
-    Content = ""
+    Title = "Filosofia, Teologia e (quem sabe) Computação."
+    Content = "Reflexões de alguém interessado em Filosofia, Teologia, Tecnologia e Desenvolvimento Pessoal desde a adolescência."
 [menus]
 
   [[menus.main]]
     name = "Sobre"
     pageRef = "/about"
     weight = 2
+  [[menus.main]]
+    name = "Tags"
+    pageRef = "/tags"
+    weight = 3
 
 
-
+[taxonomies]
+  tag = "tags"
