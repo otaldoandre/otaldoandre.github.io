@@ -4,7 +4,10 @@ title = "André"
 
 theme = "PaperMod"
 
+summaryLength = 125
+
 [params]
+  ShowSummary = true
   defaultTheme = "light"
   ShowReadingTime = true
   ShowPostNavLinks = true
