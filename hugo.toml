@@ -8,6 +8,8 @@ summaryLength = 125
 enableGitInfo = true
 
 [params]
+  ShowToc = true
+  TocOpen = true
   ShowLastMod = true
   ShowSummary = true
   defaultTheme = "light"
