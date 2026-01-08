@@ -5,8 +5,10 @@ title = "André"
 theme = "PaperMod"
 
 summaryLength = 125
+enableGitInfo = true
 
 [params]
+  ShowLastMod = true
   ShowSummary = true
   defaultTheme = "light"
   ShowReadingTime = true
