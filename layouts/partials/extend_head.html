@@ -1,8 +1,62 @@
 {{- /* Tinylytics Analytics + Kudos */ -}}
 <script src="https://tinylytics.app/embed/7ehetax5Jpj27Y8Wrhz_.js?kudos=custom" defer></script>
 
-{{- /* CSS customizado para cards de posts */ -}}
+{{- /* CSS customizado o blog */ -}}
 <style>
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(100, 100, 100, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(100, 100, 100, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(100, 100, 100, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 30% 70%, rgba(100, 100, 100, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 70% 30%, rgba(100, 100, 100, 0.04) 0%, transparent 50%);
+    background-size:
+        200% 200%,
+        300% 300%,
+        250% 250%,
+        280% 280%,
+        220% 220%;
+    animation:
+        particle1 25s ease infinite,
+        particle2 30s ease infinite,
+        particle3 20s ease infinite,
+        particle4 35s ease infinite,
+        particle5 28s ease infinite;
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes particle1 {
+    0%, 100% { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+    50% { background-position: 100% 100%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+}
+
+@keyframes particle2 {
+    0%, 100% { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+    50% { background-position: 0% 0%, 100% 100%, 0% 0%, 0% 0%, 0% 0%; }
+}
+
+@keyframes particle3 {
+    0%, 100% { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+    50% { background-position: 0% 0%, 0% 0%, 100% 100%, 0% 0%, 0% 0%; }
+}
+
+@keyframes particle4 {
+    0%, 100% { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+    50% { background-position: 0% 0%, 0% 0%, 0% 0%, 100% 100%, 0% 0%; }
+}
+
+@keyframes particle5 {
+    0%, 100% { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+    50% { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 100% 100%; }
+}
 /* Cards de posts estilo Svbtle */
 
 .post-entry {
