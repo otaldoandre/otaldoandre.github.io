@@ -8,6 +8,9 @@ summaryLength = 125
 enableGitInfo = true
 
 [params]
+  ShowAllPagesInArchive = true
+
+
   ShowToc = true
   TocOpen = true
   ShowLastMod = true
@@ -22,6 +25,8 @@ enableGitInfo = true
   [params.homeInfoParams]
     Title = "Filosofia, Teologia e (quem sabe) Computação."
     Content = "Reflexões de alguém interessado em Filosofia, Teologia, Tecnologia e Desenvolvimento Pessoal desde a adolescência."
+
+
 [menus]
 
   [[menus.main]]
