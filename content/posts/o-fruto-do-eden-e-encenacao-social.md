@@ -1,6 +1,6 @@
 +++
 date = '2026-01-05T23:56:55-03:00'
-draft = true
+draft = false
 title = 'O Fruto do Conhecimento e o Nascimento da Performance Social'
 tags = ['Gênesis', 'Cristianismo', 'Teologia Bíblica', 'Perfomance Social', 'Reflexão Teológica', 'Identidade em Cristo', 'Vida Interior', 'Liberdade em Cristo', 'Reflexões Pré-Formais', 'Antropologia Bíblica']
 
