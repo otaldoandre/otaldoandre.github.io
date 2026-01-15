@@ -1,9 +1,11 @@
 +++
 date = 2026-01-10T23:51:57-03:00
-draft = false
+draft = true
 title = "O Que E Amor O Que E Paixao"
 layout = "immersive-love-journey"
 description = "Uma reflexão sobre paixão, dor e a descoberta do amor verdadeiro"
+
+
 +++
 <div id="part-one" class="journey-section">
 

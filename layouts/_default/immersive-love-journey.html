@@ -1,12 +1,19 @@
 {{- define "main" }}
 
 <style>
-    body {
-        transition: background 2s ease;
+    /* Reset */
+    .immersive-journey {
         position: relative;
-        min-height: 100vh;
+        width: 100%;
+        overflow-x: hidden;
     }
 
+    body {
+        transition: background 3s ease;
+        overflow-x: hidden;
+    }
+
+    /* Background layers */
     body::before {
         content: '';
         position: fixed;
@@ -18,7 +25,8 @@
         background-position: center;
         background-attachment: fixed;
         z-index: -2;
-        transition: opacity 2s ease;
+        opacity: 0;
+        transition: opacity 3s ease;
     }
 
     body::after {
@@ -29,110 +37,253 @@
         width: 100%;
         height: 100%;
         z-index: -1;
-        transition: background 2s ease;
+        transition: background 3s ease;
     }
 
-    body.part-one::before {
+    /* Fases */
+    body.phase-prologue::after {
+    background-image: url('/images/dark-evangelion.png');
+    }
+
+    body.phase-act1::before {
         background-image: url('/images/dark-evangelion.png');
-        opacity: 0.4;
+        opacity: 100%;
     }
 
-    body.part-one::after {
-        background: linear-gradient(to bottom, 
-            rgba(20, 20, 30, 0.95) 0%, 
-            rgba(30, 20, 40, 0.92) 50%, 
-            rgba(20, 20, 30, 0.95) 100%);
+    body.phase-act1::after {
+        background: linear-gradient(to bottom,
+            rgba(20, 20, 30, 0.88) 0%,
+            rgba(30, 20, 40, 0.85) 50%,
+            rgba(20, 20, 30, 0.88) 100%);
     }
 
-    body.part-two::before {
+    body.phase-reading::before {
+        background-image: url('/images/dark-evangelion.png');
+        opacity: 1;
+    }
+
+    body.phase-reading::after {
+        background: linear-gradient(to bottom,
+            rgba(25, 25, 35, 0.90) 0%,
+            rgba(30, 25, 40, 0.88) 100%);
+    }
+
+    body.phase-act2::before {
         background-image: url('/images/light-landscape.png');
         opacity: 0.3;
     }
 
-    body.part-two::after {
-        background: linear-gradient(to bottom, 
-            rgba(255, 250, 240, 0.92) 0%, 
-            rgba(255, 245, 235, 0.90) 50%, 
+    body.phase-act2::after {
+        background: linear-gradient(to bottom,
+            rgba(255, 250, 240, 0.92) 0%,
+            rgba(255, 245, 235, 0.90) 50%,
             rgba(250, 240, 230, 0.92) 100%);
     }
 
-    .post-single {
+    /* Telas de frases */
+    .phrase-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    .phrase-screen.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .phrase-text {
+        font-size: 2em;
+        max-width: 900px;
+        line-height: 1.8;
+        text-align: center;
+        margin-bottom: 4rem;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 1s ease 0.3s;
+    }
+
+    .phrase-screen.active .phrase-text {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .phrase-screen.dark .phrase-text {
+        color: #e8e0f0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .phrase-screen.light .phrase-text {
+        color: #3a3530;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+    }
+
+    .continue-btn {
+        padding: 1rem 3rem;
+        font-size: 1.1em;
+        background: transparent;
+        border: 2px solid;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        opacity: 0;
+        transition: all 0.5s ease 1s;
+        letter-spacing: 1px;
+    }
+
+    .phrase-screen.active .continue-btn {
+        opacity: 1;
+    }
+
+    .phrase-screen.dark .continue-btn {
+        border-color: #c4b0e0;
+        color: #c4b0e0;
+    }
+
+    .phrase-screen.dark .continue-btn:hover {
+        background: #c4b0e0;
+        color: #1a1520;
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(196, 176, 224, 0.4);
+    }
+
+    .phrase-screen.light .continue-btn {
+        border-color: #d67840;
+        color: #d67840;
+    }
+
+    .phrase-screen.light .continue-btn:hover {
+        background: #d67840;
+        color: #fff;
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(214, 120, 64, 0.4);
+    }
+
+    /* Seção de leitura */
+    .reading-section {
+        display: none;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
         position: relative;
         z-index: 1;
     }
 
-    .post-header h1 {
-        transition: color 2s ease;
-        font-weight: 700;
-        text-align: center;
+    .reading-section.active {
+        display: block;
     }
 
-    body.part-one .post-header h1 {
-        color: #e8e0f0 !important;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    body.part-two .post-header h1 {
-        color: #2d2520 !important;
-        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-    }
-
-    .journey-section {
-        margin: 80px 0;
-        padding: 40px;
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
-        transition: all 1.5s ease;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
-
-    body.part-one .journey-section {
-        background: rgba(25, 20, 35, 0.85);
-        color: #e8e0f0;
-        border: 1px solid rgba(150, 130, 180, 0.3);
-    }
-
-    body.part-two .journey-section {
-        background: rgba(255, 255, 255, 0.9);
-        color: #2d2520;
-        border: 1px solid rgba(200, 150, 100, 0.3);
-    }
-
-    .journey-section h2 {
+    .reading-section h2 {
         font-size: 2em;
-        margin-bottom: 1em;
-        margin-top: 0.5em;
-        transition: color 2s ease;
+        margin: 3rem 0 1.5rem;
         font-weight: 600;
-    }
-
-    body.part-one .journey-section h2 {
         color: #c4b0e0;
         border-bottom: 2px solid rgba(150, 130, 180, 0.5);
-        padding-bottom: 0.3em;
+        padding-bottom: 0.5rem;
     }
 
-    body.part-two .journey-section h2 {
-        color: #d67840;
-        border-bottom: 2px solid rgba(200, 150, 100, 0.5);
-        padding-bottom: 0.3em;
-    }
-
-    .journey-section p {
-        margin-bottom: 1.5em;
-        font-size: 1.1em;
-        text-align: justify;
+    .reading-section p {
+        font-size: 1.15em;
         line-height: 1.9;
-    }
-
-    body.part-one .journey-section p {
+        margin-bottom: 1.5em;
         color: #ddd5e5;
+        text-align: justify;
     }
 
-    body.part-two .journey-section p {
+    .finish-reading-btn {
+        display: block;
+        margin: 4rem auto;
+        padding: 1rem 3rem;
+        font-size: 1.1em;
+        background: transparent;
+        border: 2px solid #c4b0e0;
+        color: #c4b0e0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .finish-reading-btn:hover {
+        background: #c4b0e0;
+        color: #1a1520;
+        transform: scale(1.05);
+    }
+
+    /* Epílogo */
+    .epilogue-final {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 2rem;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    .epilogue-final.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .epilogue-message {
+        font-size: 1.8em;
+        max-width: 700px;
+        line-height: 1.8;
         color: #3a3530;
+        margin-bottom: 3rem;
+        opacity: 0;
+        animation: fadeIn 2s ease forwards;
     }
 
+    @keyframes fadeIn {
+        to { opacity: 1; }
+    }
+
+    .epilogue-actions {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        opacity: 0;
+        animation: fadeIn 2s ease 1s forwards;
+    }
+
+    .epilogue-btn {
+        padding: 1rem 2.5rem;
+        font-size: 1em;
+        background: transparent;
+        border: 2px solid #d67840;
+        color: #d67840;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .epilogue-btn:hover {
+        background: #d67840;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(214, 120, 64, 0.3);
+    }
+
+    /* Controles de áudio */
     .audio-controls {
         position: fixed;
         bottom: 20px;
@@ -143,15 +294,10 @@
         color: white;
         font-size: 0.9em;
         backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-        z-index: 100;
+        z-index: 2000;
         display: flex;
         align-items: center;
         gap: 12px;
-    }
-
-    .audio-controls:hover {
-        background: rgba(0, 0, 0, 0.85);
     }
 
     .volume-control {
@@ -172,142 +318,230 @@
         cursor: pointer;
         font-size: 1.2em;
         padding: 5px;
-        display: flex;
-        align-items: center;
     }
 
+        #myVideo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+
+    /* Responsivo */
     @media (max-width: 768px) {
-        .journey-section {
-            padding: 25px;
-            margin: 50px 0;
-        }
-        
-        .journey-section p {
-            font-size: 1em;
+        .phrase-text {
+            font-size: 1.4em;
         }
 
-        .audio-controls {
-            bottom: 10px;
-            right: 10px;
-            padding: 10px 15px;
+        .reading-section {
+            padding: 3rem 1.5rem;
         }
+
+        .reading-section h2 {
+            font-size: 1.6em;
+        }
+
+        .reading-section p {
+            font-size: 1.05em;
+        }
+
     }
+
+
 </style>
 
-<article class="post-single">
-    <header class="post-header">
-        {{ partial "breadcrumbs.html" . }}
-        <h1 class="post-title entry-hint-parent">
-            {{ .Title }}
-            {{- if .Draft }}
-            <span class="entry-hint" title="Draft">
-                <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
-                    <path d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
-                </svg>
-            </span>
-            {{- end }}
-        </h1>
-        {{- if .Description }}
-        <div class="post-description">
-            {{ .Description }}
-        </div>
-        {{- end }}
-        {{- if not (.Param "hideMeta") }}
-        <div class="post-meta">
-            {{- partial "post_meta.html" . -}}
-            {{- partial "translation_list.html" . -}}
-            {{- partial "edit_post.html" . -}}
-            {{- partial "post_canonical.html" . -}}
-        </div>
-        {{- end }}
-    </header>
-
-    {{- $isHidden := (.Param "cover.hiddenInSingle") | default (.Param "cover.hidden") | default false }}
-    {{- partial "cover.html" (dict "cxt" . "IsSingle" true "isHidden" $isHidden) }}
-    {{- if (.Param "ShowToc") }}
-    {{- partial "toc.html" . }}
-    {{- end }}
-
-    {{- if .Content }}
-    <div class="post-content">
-        {{- if not (.Param "disableAnchoredHeadings") }}
-        {{- partial "anchored_headings.html" .Content -}}
-        {{- else }}{{ .Content }}{{ end }}
+<div class="immersive-journey">
+    <!-- PRÓLOGO -->
+    <div class="phrase-screen active dark" id="prologue" data-phase="prologue">
+        <div class="phrase-text">{{ .Title }}</div>
+        <button class="continue-btn" onclick="nextPhrase()">O que é amor?</button>
     </div>
-    {{- end }}
 
-    <br>
-    {{- $tags := .Language.Params.Taxonomies.tag | default "tags" }}
-    <ul class="post-tags">
-        {{- range ($.GetTerms $tags) }}
-        <li><a href="{{ .Permalink }}">{{ .LinkTitle }}</a></li>
-        {{- end }}
-    </ul>
+    <!-- ATO I - Frases -->
+    <div class="phrase-screen dark" data-phase="act1">
+        <div class="phrase-text">Era como viver em um sonho que lentamente se dissolvia em pesadelo.</div>
+        <button class="continue-btn" onclick="nextPhrase()">É o que eu quero!!</button>
+    </div>
 
-    {{- partial "extend_footer.html" . -}}
+    <div class="phrase-screen dark" data-phase="act1">
+        <div class="phrase-text">A paixão consome. Ela queima com uma intensidade que confundimos com profundidade.</div>
+        <button class="continue-btn" onclick="nextPhrase()">O apego é o mais importante!</button>
+    </div>
 
-    <footer class="post-footer">
-        {{- if (.Param "ShowPostNavLinks") }}
-        {{- partial "post_nav_links.html" . }}
-        {{- end }}
-        {{- if (and site.Params.ShowShareButtons (ne .Params.disableShare true)) }}
-        {{- partial "share_icons.html" . -}}
-        {{- end }}
-    </footer>
+    <div class="phrase-screen dark" data-phase="act1">
+        <div class="phrase-text">Preenchia os silêncios com expectativas, os vazios com projeções.<br>Não via a pessoa real.</div>
+        <button class="continue-btn" onclick="nextPhrase()">Nós nunca vamos nos separar</button>
+    </div>
 
-    {{- if (.Param "comments") }}
-    {{- partial "comments.html" . }}
-    {{- end }}
-</article>
+    <div class="phrase-screen dark" data-phase="act1">
+        <div class="phrase-text">Havia dependência disfarçada de devoção.<br>Eu não amava — eu precisava.</div>
+        <button class="continue-btn" onclick="nextPhrase()">Eu não aceito ela longe</button>
+    </div>
 
+    <div class="phrase-screen dark" data-phase="act1">
+        <div class="phrase-text">A paixão promete eternidade mas entrega apenas instantes.</div>
+        <button class="continue-btn" onclick="nextPhrase()">Talvez tenha algo a mais sobre isso?</button>
+    </div>
+
+    <!-- LEITURA COMPLETA -->
+    <div class="reading-section" id="readingSection" data-phase="reading">
+        {{ .Content }}
+        <button class="finish-reading-btn" onclick="nextPhrase()">Finalizar Jornada</button>
+    </div>
+
+    <!-- ATO II - Frases finais -->
+    <div class="phrase-screen light" data-phase="act2">
+        <div class="phrase-text">E então... algo mudou.</div>
+        <button class="continue-btn" onclick="nextPhrase()">Continuar</button>
+    </div>
+
+    <div class="phrase-screen light" data-phase="act2">
+        <div class="phrase-text">Aprendi que amor não é a intensidade que nos tira o chão —<br>é a presença que nos dá raízes.</div>
+        <button class="continue-btn" onclick="nextPhrase()">Continuar</button>
+    </div>
+
+    <div class="phrase-screen light" data-phase="act2">
+        <div class="phrase-text">Descobri que amar é primeiro um verbo<br>que se conjuga na primeira pessoa.</div>
+        <button class="continue-btn" onclick="nextPhrase()">Continuar</button>
+    </div>
+
+    <div class="phrase-screen light" data-phase="act2">
+        <div class="phrase-text">O amor que encontrei tinha paciência.<br>Tinha espaço para o silêncio sem desconforto.</div>
+        <button class="continue-btn" onclick="nextPhrase()">Continuar</button>
+    </div>
+
+    <div class="phrase-screen light" data-phase="act2">
+        <div class="phrase-text">Aprendi que amar é também deixar ir.<br>É confiar que o que é verdadeiro permanece.</div>
+        <button class="continue-btn" onclick="nextPhrase()">Finalizar</button>
+    </div>
+
+    <!-- EPÍLOGO -->
+    <div class="epilogue-final" id="epilogue">
+        <div class="epilogue-message">
+            Esta é minha jornada.<br>
+            Das cinzas da paixão ao florescimento do amor.<br>
+            Da ilusão à verdade.<br>
+            E continua.
+        </div>
+        <div class="epilogue-actions">
+            <button class="epilogue-btn" onclick="restartJourney()">Reviver a Jornada</button>
+            <a href="/" class="epilogue-btn">Explorar Mais</a>
+        </div>
+
+        <!-- <video autoplay muted loop id="myVideo"> -->
+           <!-- <source src="/videos/shinji-on-the-beach.mp4" type="video/mp4">-->
+        <!--</video>-->
+
+    </div>
+</div>
+
+<!-- Controles -->
 <div class="audio-controls">
-    <button class="mute-btn" id="muteBtn" title="Mute/Unmute">🔊</button>
+    <button class="mute-btn" id="muteBtn">🔊</button>
     <div class="volume-control">
         <span>Volume</span>
         <input type="range" min="0" max="100" value="70" class="volume-slider" id="volumeSlider">
     </div>
 </div>
 
-<audio id="audio-part-one" loop preload="auto">
+<!-- Áudios -->
+<audio id="audio-act1" loop preload="auto">
     <source src="/audio/komm-susser-tod.mp3" type="audio/mpeg">
 </audio>
 
-<audio id="audio-part-two" loop preload="auto">
+<audio id="audio-act2" loop preload="auto">
     <source src="/audio/love-comes-to-everyone.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-    const audioPart1 = document.getElementById('audio-part-one');
-    const audioPart2 = document.getElementById('audio-part-two');
+(function() {
+    const screens = document.querySelectorAll('.phrase-screen, .reading-section, .epilogue-final');
+    const audioAct1 = document.getElementById('audio-act1');
+    const audioAct2 = document.getElementById('audio-act2');
     const volumeSlider = document.getElementById('volumeSlider');
     const muteBtn = document.getElementById('muteBtn');
     const body = document.body;
 
-    let currentPart = 1;
+    let currentIndex = 0;
     let isMuted = false;
+    let audioStarted = false;
+    let currentPhase = 'prologue';
 
-    // Configuração inicial de volume
-    const initialVolume = 0.7;
-    audioPart1.volume = initialVolume;
-    audioPart2.volume = 0;
+    audioAct1.volume = 0.7;
+    audioAct2.volume = 0;
+    body.classList.add('phase-prologue');
 
-    // Função para crossfade entre músicas
-    function crossfade(fadeOut, fadeIn, duration = 2000) {
-        const steps = 50;
+    window.nextPhrase = function() {
+        // Ocultar tela atual
+        screens[currentIndex].classList.remove('active');
+
+        // Avançar
+        currentIndex++;
+
+        if (currentIndex >= screens.length) {
+            return;
+        }
+
+        // Mostrar próxima tela
+        setTimeout(() => {
+            screens[currentIndex].classList.add('active');
+
+            // Atualizar fase
+            const newPhase = screens[currentIndex].dataset.phase;
+            if (newPhase && newPhase !== currentPhase) {
+                updatePhase(newPhase);
+            }
+
+            // Scroll to top para leitura
+            if (screens[currentIndex].classList.contains('reading-section')) {
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+        }, 500);
+
+        // Iniciar áudio no primeiro continuar
+        if (!audioStarted && currentIndex === 1) {
+            audioAct1.play().catch(e => console.log('Autoplay:', e));
+            audioStarted = true;
+        }
+    };
+
+    window.restartJourney = function() {
+        screens[currentIndex].classList.remove('active');
+        currentIndex = 0;
+        screens[0].classList.add('active');
+        updatePhase('prologue');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    };
+
+    function updatePhase(newPhase) {
+        if (newPhase === currentPhase) return;
+
+        body.classList.remove(`phase-${currentPhase}`);
+        body.classList.add(`phase-${newPhase}`);
+
+        // Transição de música
+        if (currentPhase === 'act1' && newPhase === 'act2') {
+            console.log('🌙 → ☀️ Transição musical');
+            if (!isMuted) crossfade(audioAct1, audioAct2);
+        }
+
+        currentPhase = newPhase;
+    }
+
+    function crossfade(fadeOut, fadeIn, duration = 3000) {
+        const steps = 60;
         const interval = duration / steps;
-        const volumeStep = 1 / steps;
+        const targetVolume = volumeSlider.value / 100;
         let currentStep = 0;
 
         const fadeInterval = setInterval(() => {
             currentStep++;
-            
-            if (fadeOut.volume > 0) {
-                fadeOut.volume = Math.max(0, fadeOut.volume - volumeStep * (volumeSlider.value / 100));
-            }
-            
-            if (fadeIn.volume < (volumeSlider.value / 100)) {
-                fadeIn.volume = Math.min(volumeSlider.value / 100, fadeIn.volume + volumeStep * (volumeSlider.value / 100));
-            }
+            const progress = currentStep / steps;
+
+            fadeOut.volume = Math.max(0, targetVolume * (1 - progress));
+            fadeIn.volume = Math.min(targetVolume, targetVolume * progress);
 
             if (currentStep >= steps) {
                 clearInterval(fadeInterval);
@@ -317,91 +551,23 @@
         }, interval);
     }
 
-    // Detectar em qual parte do post o usuário está
-    function checkScrollPosition() {
-        const partOne = document.getElementById('part-one');
-        const partTwo = document.getElementById('part-two');
-        
-        if (!partOne || !partTwo) {
-            console.log('Elementos part-one ou part-two não encontrados!');
-            return;
-        }
-
-        const scrollPosition = window.scrollY + window.innerHeight / 2;
-        const partTwoTop = partTwo.offsetTop;
-
-        if (scrollPosition < partTwoTop && currentPart !== 1) {
-            // Transição para parte 1
-            console.log('🌙 Mudando para Parte 1');
-            currentPart = 1;
-            body.classList.remove('part-two');
-            body.classList.add('part-one');
-            
-            if (!isMuted) {
-                crossfade(audioPart2, audioPart1);
-            }
-        } else if (scrollPosition >= partTwoTop && currentPart !== 2) {
-            // Transição para parte 2
-            console.log('☀️ Mudando para Parte 2');
-            currentPart = 2;
-            body.classList.remove('part-one');
-            body.classList.add('part-two');
-            
-            if (!isMuted) {
-                crossfade(audioPart1, audioPart2);
-            }
-        }
-    }
-
-    // Controle de volume
+    // Controles
     volumeSlider.addEventListener('input', (e) => {
         const volume = e.target.value / 100;
-        if (currentPart === 1) {
-            audioPart1.volume = volume;
+        if (currentPhase === 'act1' || currentPhase === 'reading') {
+            audioAct1.volume = volume;
         } else {
-            audioPart2.volume = volume;
+            audioAct2.volume = volume;
         }
     });
 
-    // Controle de mute
     muteBtn.addEventListener('click', () => {
         isMuted = !isMuted;
-        
-        if (isMuted) {
-            audioPart1.volume = 0;
-            audioPart2.volume = 0;
-            muteBtn.textContent = '🔇';
-        } else {
-            const volume = volumeSlider.value / 100;
-            if (currentPart === 1) {
-                audioPart1.volume = volume;
-            } else {
-                audioPart2.volume = volume;
-            }
-            muteBtn.textContent = '🔊';
-        }
+        audioAct1.volume = isMuted ? 0 : volumeSlider.value / 100;
+        audioAct2.volume = isMuted ? 0 : volumeSlider.value / 100;
+        muteBtn.textContent = isMuted ? '🔇' : '🔊';
     });
-
-    // Iniciar primeira música quando usuário interage com a página
-    let audioStarted = false;
-    function startAudio() {
-        if (!audioStarted) {
-            audioPart1.play().catch(e => console.log('Autoplay prevented:', e));
-            audioStarted = true;
-            console.log('🎵 Áudio iniciado');
-        }
-    }
-
-    // Event listeners
-    window.addEventListener('scroll', checkScrollPosition);
-    document.addEventListener('click', startAudio, { once: true });
-    document.addEventListener('keydown', startAudio, { once: true });
-
-    // Inicializar com parte 1
-    body.classList.add('part-one');
-
-    // Check inicial
-    setTimeout(checkScrollPosition, 500);
+})();
 </script>
 
-{{- end }}{{/* end main */}}
+{{- end }}

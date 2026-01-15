@@ -136,24 +136,34 @@
 
     // Aguarda o Tinylytics carregar e pega o contador inicial
     function waitForTinylytics() {
-        const checkInterval = setInterval(() => {
-            // O Tinylytics injeta o número no botão dele
-            const count = tinylyticsBtn.textContent.trim();
-            if (count !== '') {
-                clearInterval(checkInterval);
-                currentCount = parseInt(count) || 0;
-                updateCountDisplay();
+    let attempts = 0;
+    const maxAttempts = 50; // 5 segundos
 
-                if (hasGivenKudos || tinylyticsBtn.classList.contains('did_select')) {
-                    btn.classList.add('completed');
-                    hasGivenKudos = true;
-                }
+    const checkInterval = setInterval(() => {
+        attempts++;
+
+        // O Tinylytics injeta o número no botão dele
+        const count = tinylyticsBtn.textContent.trim();
+
+        if (count !== '') {
+            clearInterval(checkInterval);
+            currentCount = parseInt(count) || 0;
+            updateCountDisplay();
+
+            if (hasGivenKudos || tinylyticsBtn.classList.contains('did_select')) {
+                btn.classList.add('completed');
+                hasGivenKudos = true;
             }
-        }, 100);
-
-        // Timeout de 5 segundos
-        setTimeout(() => clearInterval(checkInterval), 5000);
-    }
+        } else if (attempts >= maxAttempts) {
+            // Timeout - Tinylytics não carregou
+            clearInterval(checkInterval);
+            console.log('Tinylytics não carregou, mas o kudos ainda funciona');
+            // Permite funcionar mesmo sem o contador
+            currentCount = 0;
+            updateCountDisplay();
+        }
+    }, 100);
+}
 
     // Atualiza o display
     function updateCountDisplay() {
