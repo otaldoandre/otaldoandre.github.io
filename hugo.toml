@@ -9,7 +9,7 @@ enableGitInfo = true
 
 [params]
   ShowAllPagesInArchive = true
-
+  author = "André"
 
   ShowToc = true
   TocOpen = true
