@@ -6,9 +6,9 @@ summary = ""
 ShowToc = false
 +++
 <!--more-->
-quando eu era criança eu não era assim
+quando ele era criança ele não era assim
 
-comparando, parece que eu estou afundado em dúvidas, confusões, dilemas
+comparando, parece que ele está afundado em dúvidas, confusões, dilemas
 
 cadê aquele menino?
 
@@ -48,7 +48,7 @@ ter uma vida simples, despreocupada
 
 como as dos filmes de aventura dos anos 90
 
-ela pensa
+ele pensa
 
 será que isso vai voltar?
 
@@ -72,11 +72,10 @@ não andar em uma estrada
 
 que não dá em nenhum lugar
 
-ficar preso nessa história
-
-de pensar
+ficar preso nessa história de pensar 
 
 
+...
 
 de pai para filho
 
