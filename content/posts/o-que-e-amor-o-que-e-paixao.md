@@ -1,6 +1,6 @@
 +++
 date = 2026-01-10T23:51:57-03:00
-draft = true
+draft = false
 title = "O Que E Amor O Que E Paixao"
 layout = "immersive-love-journey"
 description = "Uma reflexão sobre paixão, dor e a descoberta do amor verdadeiro"
@@ -27,9 +27,27 @@ A paixão promete eternidade mas entrega apenas instantes. E quando esses instan
 
 ## Parte II: O Despertar da Luz
 
+
+Agora não é sobre ela. É sobre mim. O que eu sentia. O que eu queria. 
+
+Você estar bem não me rebaixava. Eu me rebaixava.
+
+Meu valor não é medido pelo seu sucesso ou falta dele.
+
+Não é medido.
+
+Se encontra na Verdade.
+
+No Amor infinito.
+
+É lá onde eu quero morar.
+
+E lá onde eu tenho valor infinito.
+
+
 Mas então algo mudou. Não foi um momento dramático — foi um despertar gradual, como os olhos se ajustando à luz depois de muito tempo na escuridão.
 
-Aprendi que amor não é a intensidade que nos tira o chão — é a presença que nos dá raízes. Não é a obsessão que nos consome — é a leveza que nos liberta. Amor verdadeiro não exige que sejamos diferentes do que somos; ele nos convida a ser mais plenamente nós mesmos.
+Aprendi que amor não é a intensidade que nos tira o chão — é a presença que nos dá raízes. Não é a obsessão que nos consome — é a leveza que nos liberta. É de fardo leve. Amor verdadeiro não exige que sejamos diferentes do que somos; ele nos convida a ser mais plenamente nós mesmos.
 
 Descobri que amar é primeiro um verbo que se conjuga na primeira pessoa: amar a mim mesmo, com minhas feridas e imperfeições. É aceitar que estar completo não significa estar perfeito. É reconhecer que não preciso de alguém para me completar — posso compartilhar uma completude que já existe.
 
