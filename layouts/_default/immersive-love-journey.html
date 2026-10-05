@@ -158,10 +158,13 @@
     /* Scrollable Timeline History */
     .scrollable-history {
         display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10001;
+        overflow-y: auto;
         padding: 100px 20px;
         background: #111;
         color: #eee;
-        min-height: 100vh;
     }
 
     .scrollable-history.active {
@@ -348,15 +351,15 @@
     /* Seção de leitura */
     .reading-section {
         display: none;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 4rem 2rem;
+        /* Tela cheia com altura fixa: o scroll acontece dentro da seção.
+           O padding lateral centraliza o texto numa coluna de 800px. */
+        padding: 4rem max(2rem, calc((100% - 800px) / 2));
+        box-sizing: border-box;
         position: fixed;
         top: 0;
-        left: 50%;
-        transform: translateX(-50%);
+        left: 0;
         z-index: 9998;
-        min-height: 100vh;
+        height: 100vh;
         width: 100%;
         overflow-y: auto;
         opacity: 0;
@@ -402,6 +405,26 @@
         background: #c4b0e0;
         color: #1a1520;
         transform: scale(1.05);
+    }
+
+    /* Leitura clara (Parte II, no Ato II) */
+    .reading-section.light h2 {
+        color: #b85f2c;
+        border-bottom-color: rgba(214, 120, 64, 0.4);
+    }
+
+    .reading-section.light p {
+        color: #3a3530;
+    }
+
+    .reading-section.light .finish-reading-btn {
+        border-color: #d67840;
+        color: #d67840;
+    }
+
+    .reading-section.light .finish-reading-btn:hover {
+        background: #d67840;
+        color: #fff;
     }
 
     /* Epílogo */
@@ -468,32 +491,6 @@
         color: #fff;
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(214, 120, 64, 0.3);
-    }
-
-    /* Journey Complete - Enable Full Scroll */
-    body.journey-complete {
-        overflow-y: auto !important;
-    }
-
-    body.journey-complete .immersive-journey {
-        display: flex;
-        flex-direction: column;
-    }
-
-    body.journey-complete .phrase-screen,
-    body.journey-complete .reading-section,
-    body.journey-complete .epilogue-final {
-        position: relative !important;
-        display: flex !important;
-        opacity: 1 !important;
-        min-height: 100vh;
-        width: 100%;
-        transform: none !important;
-        left: auto !important;
-    }
-
-    body.journey-complete .reading-section {
-        display: block !important;
     }
 
     /* Controles de áudio */
@@ -616,15 +613,12 @@
         <button class="continue-btn" onclick="window.journeyApp.nextPhrase(event)">Talvez tenha algo a mais sobre isso?</button>
     </div>
 
-    <!-- LEITURA COMPLETA -->
+    {{- /* O post é dividido em partes por uma linha "---" no markdown (vira <hr>) */}}
+    {{- $partes := split .Content "<hr>" }}
+
+    <!-- LEITURA: PARTE I (escura) -->
     <div class="reading-section" id="readingSection" data-phase="reading">
-        {{ if .Content }}
-            {{ .Content }}
-        {{ else }}
-            <h2>A Jornada</h2>
-            <p>Esta é uma jornada de autodescoberta, do que achava que era amor ao entendimento verdadeiro do que significa amar.</p>
-            <p>Continue navegando para descobrir mais sobre esta transformação...</p>
-        {{ end }}
+        {{ index $partes 0 | safeHTML }}
         <button class="finish-reading-btn" onclick="window.journeyApp.nextPhrase(event)">Finalizar Jornada</button>
     </div>
 
@@ -633,6 +627,14 @@
         <div class="phrase-text">E então... algo mudou.</div>
         <button class="continue-btn" onclick="window.journeyApp.nextPhrase(event)">Continuar</button>
     </div>
+
+    {{- if gt (len $partes) 1 }}
+    <!-- LEITURA: PARTE II (clara) -->
+    <div class="reading-section light" id="readingSection2" data-phase="act2">
+        {{ index $partes 1 | safeHTML }}
+        <button class="finish-reading-btn" onclick="window.journeyApp.nextPhrase(event)">Continuar</button>
+    </div>
+    {{- end }}
 
     <div class="phrase-screen light" data-phase="act2">
         <div class="phrase-text">Aprendi que amor não é a intensidade que nos tira o chão —<br>é a presença que nos dá raízes.</div>
@@ -730,6 +732,7 @@ window.journeyApp = (function() {
     let audioStarted = false;
     let currentPhase = 'prologue';
     let isMuted = false;
+    let timelineListenerAdded = false;
 
     const screens = document.querySelectorAll('.phrase-screen, .reading-section, .epilogue-final');
     const timelineEl = document.getElementById('cinematicTimeline');
@@ -859,12 +862,7 @@ window.journeyApp = (function() {
                 const newPhase = screens[currentIndex].dataset.phase;
                 if (newPhase) updatePhase(newPhase);
                 if (screens[currentIndex].classList.contains('reading-section')) {
-                    window.scrollTo({top: 0, behavior: 'smooth'});
-                }
-
-                if (screens[currentIndex].classList.contains('epilogue-final')) {
-                    console.log('Reached epilogue - enabling full journey scroll');
-                    enableFullJourneyScroll();
+                    screens[currentIndex].scrollTop = 0;
                 }
             }, 500);
         }
@@ -876,9 +874,13 @@ window.journeyApp = (function() {
         timelineEl.classList.add('active');
         timelineEl.scrollTop = 0;
 
+        if (timelineListenerAdded) return;
+        timelineListenerAdded = true;
+
         // When user scrolls to bottom, move to reading section
         let scrollEndTimer;
         timelineEl.addEventListener('scroll', () => {
+            if (!timelineEl.classList.contains('active')) return;
             const isAtBottom = timelineEl.scrollHeight - timelineEl.scrollTop <= timelineEl.clientHeight + 100;
 
             if (isAtBottom) {
@@ -890,25 +892,11 @@ window.journeyApp = (function() {
                     if (screens[currentIndex]) {
                         screens[currentIndex].classList.add('active');
                         updatePhase('reading');
-                        window.scrollTo({top: 0, behavior: 'smooth'});
+                        screens[currentIndex].scrollTop = 0;
                     }
                 }, 1000);
             }
         });
-    }
-
-    function enableFullJourneyScroll() {
-        body.classList.add('journey-complete');
-
-        // Make all screens visible
-        screens.forEach(screen => {
-            screen.classList.add('active');
-        });
-
-        // Scroll to top
-        setTimeout(() => {
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }, 100);
     }
 
     function updatePhase(newPhase) {
@@ -938,7 +926,7 @@ window.journeyApp = (function() {
     }
 
     function restartJourney() {
-        body.classList.remove('journey-complete');
+        hideHistory();
         screens.forEach(screen => screen.classList.remove('active'));
 
         currentIndex = 0;
@@ -971,7 +959,7 @@ window.journeyApp = (function() {
 
         if (historySection) {
             historySection.classList.add('active');
-            historySection.scrollIntoView({behavior: 'smooth'});
+            historySection.scrollTop = 0;
         }
     }
 

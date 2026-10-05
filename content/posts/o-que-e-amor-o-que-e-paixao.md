@@ -1,12 +1,10 @@
 +++
 date = 2026-01-10T23:51:57-03:00
-draft = false
+draft = true
 title = "O Que E Amor O Que E Paixao"
 layout = "immersive-love-journey"
 description = "Uma reflexão sobre paixão, dor e a descoberta do amor verdadeiro"
 +++
-<div id="part-one" class="journey-section">
-
 ## Parte I: O Peso das Ilusões
 
 Era como viver em um sonho que lentamente se dissolvia em pesadelo. Eu chamava aquilo de amor, mas era apenas o reflexo distorcido do que eu desejava ver — não o que realmente existia.
@@ -21,9 +19,7 @@ Havia dependência disfarçada de devoção. Havia medo mascarado de intensidade
 
 A paixão promete eternidade mas entrega apenas instantes. E quando esses instantes passam, ficamos com as mãos vazias, tentando segurar fumaça, perguntando onde erramos, sem perceber que o erro foi pensar que aquilo poderia ser sustentável.
 
-</div>
-
-<div id="part-two" class="journey-section">
+---
 
 ## Parte II: O Despertar da Luz
 
@@ -62,5 +58,3 @@ E acordei. Não em um mundo sem amor, mas em um mundo onde o amor é possível �
 O amor chega quando paramos de procurá-lo desesperadamente. Ele aparece quando finalmente entendemos que não precisamos ser salvos — precisamos apenas ser vistos, aceitos, e ter a coragem de ver e aceitar em retorno.
 
 Esta é minha jornada. Das cinzas da paixão ao florescimento do amor. Da ilusão à verdade. Da dependência à liberdade. E continua — porque amor verdadeiro não é destino, é caminho.
-
-</div>
